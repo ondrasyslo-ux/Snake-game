@@ -1,2 +1,11 @@
 Test1 10 
 f 5 
+KingBigKin 12 
+test2 9 
+test3 9 
+test4 11
+test5 1
+test6 8
+test7 3
+test8 9
+test9 20

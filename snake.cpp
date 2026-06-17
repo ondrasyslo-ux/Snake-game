@@ -8,8 +8,11 @@
 #include "zebricek.h"
 
 /*    VECI NA PRIDANI
-    menu - nastaveni, zapnout hru, zobrazit zebricek
-            nastaveni - zmena velikosti okna, zmena barev?, ??jina velikost mapy, jina mapa s bloky do kterych lze narazit uvnitr
+            nastaveni - zmena velikosti okna, zmena barev?, ??jina velikost mapy, 
+            jina mapa s bloky do kterych lze narazit uvnitr
+            mapy:
+                zakladni, tutorial na ukazku(4x5), s bloky
+
     ultimatni vyhra
     specialni pamlsek co da vice bodu tela
 */
@@ -80,12 +83,15 @@ enum StavHry {
     NASTAVENI,
     HRANI,
     KONEC_HRY,
+    ZEBRICEK,
 };
 
 class herniNastaveni {
 public:
     Snake snake;
     Jablko jablko;
+
+    Zebricek spravceZebricku;
 
     StavHry aktualniStav = MENU;
 
@@ -94,7 +100,7 @@ public:
     float timeSinceLastMove = 0;
     float moveInterval = 0.2f;
 
-    herniNastaveni() {
+    herniNastaveni() : spravceZebricku("zebricek.txt") {
         jablko.Generuj(snake.body);
     }
     
@@ -106,6 +112,9 @@ public:
             }
             if(IsKeyPressed(KEY_TAB)) {
                 aktualniStav = NASTAVENI;
+            }
+            if(IsKeyPressed(KEY_LEFT_CONTROL)) {
+                aktualniStav = ZEBRICEK;
             }
         }
         else if(aktualniStav == HRANI) {
@@ -162,12 +171,8 @@ public:
             } 
             
             if(IsKeyPressed(KEY_ENTER)) {
-                std::ofstream Zebricek("zebricek.txt", std::ios::app);
-                if(Zebricek.is_open())  {
-                    int skore = snake.body.size() -1;
-                    Zebricek << jmenoHrace << " " << skore << " \n";
-                    Zebricek.close();
-                }
+                int skore = snake.body.size() -1;
+                spravceZebricku.ulozNovyVysledek(jmenoHrace, skore);
 
                 snake.body.clear();
                 snake.body.push_back({10, 10});
@@ -179,6 +184,19 @@ public:
             }
         
         }
+        
+        else if(aktualniStav == ZEBRICEK) {
+            if(IsKeyPressed(KEY_BACKSPACE)) {
+                aktualniStav = MENU;
+            }
+        }
+
+        else if(aktualniStav == NASTAVENI) {
+            if(IsKeyPressed(KEY_BACKSPACE)) {
+                aktualniStav = MENU;
+            }
+        }
+
     }
 
     void Draw() {
@@ -189,6 +207,8 @@ public:
             DrawText("SNAKE GAME", 265, 200, 40, DARKPURPLE);
             DrawText("Zmackni MEZERNIK pro start", 250, 300, 20, BLACK);
             DrawText("Zmackni TAB pro nastaveni", 255, 340, 20, LIGHTGRAY);
+            DrawText("Zmackni CTRL pro zebricek", 255, 380, 20, LIGHTGRAY);
+            DrawText("Zmackni ESC pro ukonceni", 255, 420, 20, RED);
         }
         else if(aktualniStav == HRANI) {
             int skore = snake.body.size() -1;
@@ -198,7 +218,20 @@ public:
             jablko.Draw();
         }
         else if(aktualniStav == NASTAVENI) {
+            DrawText("Nastaveni", 265, 200, 40, DARKPURPLE);
+            DrawText("Zmackni BACKSPACE pro menu", 250, 300, 20, BLACK);
 
+        }
+        else if(aktualniStav == ZEBRICEK) {
+            DrawText("TOP 10 HRACU:", 260, 80, 40, DARKGREEN);
+            std::vector<ZaznamZebricku> dataZebricku = spravceZebricku.ZiskejTop10();
+
+            for(int i = 0; i < dataZebricku.size(); i++) {
+                const char* textZaznamu = TextFormat("%d. %s - %i", i + 1, 
+                    dataZebricku[i].jmeno.c_str(), dataZebricku[i].skore);
+                DrawText( textZaznamu, 200, 180 +(i * 30), 20, BLACK);
+            }
+            DrawText("Zmackni BACKSPACE pro menu", 50, 530, 20, BLACK);
         }
         else if(aktualniStav == KONEC_HRY) {
             DrawText("KONEC HRY!", 265, 150, 40, RED);
