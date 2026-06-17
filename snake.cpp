@@ -13,6 +13,8 @@
             mapy:
                 zakladni, tutorial na ukazku(4x5), s bloky
 
+        predelat do vice hlavickovych souboru
+
     ultimatni vyhra
     specialni pamlsek co da vice bodu tela
 */
@@ -84,6 +86,7 @@ enum StavHry {
     HRANI,
     KONEC_HRY,
     ZEBRICEK,
+    VYHRA,
 };
 
 class herniNastaveni {
@@ -144,6 +147,11 @@ public:
                    aktualniStav = KONEC_HRY;
                         }
                     }
+
+                if(snake.body.size() ==936) {
+                    aktualniStav = VYHRA;
+                }
+                
                 if(snedl == true) {
                     jablko.Generuj(snake.body);
                     moveInterval -= 0.005f;
@@ -184,7 +192,35 @@ public:
             }
         
         }
-        
+
+        else if(aktualniStav == VYHRA) {
+            int zklavesnice = GetCharPressed();
+
+            while(zklavesnice > 0) {
+                if((zklavesnice >= 33) && (zklavesnice <= 125) 
+                && (jmenoHrace.length() < 10)) {
+                    jmenoHrace += (char)zklavesnice;
+                }
+                zklavesnice = GetCharPressed();
+
+                if(IsKeyPressed(KEY_BACKSPACE) && jmenoHrace.length() > 0) {
+                    jmenoHrace.pop_back();
+                }
+                if(IsKeyPressed(KEY_ENTER)) {
+                    int skore = snake.body.size() -1;
+                    spravceZebricku.ulozNovyVysledek(jmenoHrace, skore);
+
+                    snake.body.clear();
+                    snake.body.push_back({10, 10});
+                    snake.direction = {1, 0};
+                    moveInterval = 0.2f;
+
+                    jmenoHrace = " ";
+                    aktualniStav = MENU;
+                }
+            }
+        }
+
         else if(aktualniStav == ZEBRICEK) {
             if(IsKeyPressed(KEY_BACKSPACE)) {
                 aktualniStav = MENU;
@@ -196,6 +232,7 @@ public:
                 aktualniStav = MENU;
             }
         }
+
 
     }
 
@@ -246,7 +283,19 @@ public:
 
             DrawText("Stiskni ENTER pro navrat do Menu", 225, 420, 20, DARKGRAY);
         }
+        else if(aktualniStav == VYHRA) {
+            DrawText("VYHRAL JSI!", 265, 150, 40, GOLD);
 
+            int skore = snake.body.size() -1;
+            DrawText(TextFormat("Vyhral jsi, skore: %i", skore), 250, 220, 40, DARKBROWN);
+
+            DrawText("Zadejte sve jmeno:", 305, 280, 20, GREEN);
+            DrawText(jmenoHrace.c_str(), 300, 310, 30, DARKPURPLE);
+
+            DrawRectangle(300, 345, 200, 2, BLACK);
+
+            DrawText("Stiskni ENTER pro navrat do Menu", 225, 420, 20, DARKGRAY);
+        }
     }
 
 };
