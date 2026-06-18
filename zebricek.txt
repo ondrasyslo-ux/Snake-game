@@ -9,3 +9,4 @@ test6 8
 test7 3
 test8 9
 test9 20test10 8 
+novypokus 35 

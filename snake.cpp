@@ -7,9 +7,10 @@
 
 #include "zebricek.h"
 #include "jablko.h"
+#include "mapa.h"
 
 /*    VECI NA PRIDANI
-            nastaveni - zmena velikosti okna, zmena barev?, ??jina velikost mapy, 
+            nastaveni - zmena velikosti okna na fullscreen, zmena barev?,
             jina mapa s bloky do kterych lze narazit uvnitr
             mapy:
                 zakladni, tutorial na ukazku(4x5), s bloky
@@ -29,11 +30,20 @@ spusteni:
 
 class Snake {
 public:
-    std::deque<Vector2> body = { {10, 10} };
+    std::deque<Vector2> body;
     Vector2 direction = {1, 0};
     int size = 20;
-
     int kTraveni = 0;
+
+    void Restart(int minX, int maxX, int minY, int maxY) {
+        body.clear();
+        int stredX = minX + (maxX - minX) / 2;
+        int stredY = minY + (maxY - minY) / 2;
+        body.push_back({(float)stredX, (float)stredY});
+
+        direction = {1,0};
+        kTraveni = 0;
+    }
 
     void Update(bool snedlJablko = false) {
         Vector2 newHead = { body[0].x + direction.x, body[0].y + direction.y };
@@ -71,6 +81,7 @@ public:
     Jablko jablko;
     ZlateJablko zlateJablko;
     Zebricek spravceZebricku;
+    Mapa herniMapa;
 
     int pocitadloJablek = 0;
 
@@ -82,7 +93,10 @@ public:
     float moveInterval = 0.2f;
 
     herniNastaveni() : spravceZebricku("zebricek.txt") {
-        jablko.Generuj(snake.body);
+        snake.Restart(herniMapa.minX, herniMapa.maxX,
+             herniMapa.minY, herniMapa.maxY);
+        jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
+             herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
     }
     
 
@@ -107,10 +121,17 @@ public:
             timeSinceLastMove += GetFrameTime();
 
             //naraz do zdi
-            if(snake.body[0].x < 2 || snake.body[0].x > 37 ||
-                 snake.body[0].y < 2 || snake.body[0].y > 27) {
+            if(snake.body[0].x < herniMapa.minX || snake.body[0].x > herniMapa.maxX ||
+                 snake.body[0].y < herniMapa.minY || snake.body[0].y > herniMapa.maxY) {
                 aktualniStav = KONEC_HRY;
                 }
+
+            for(int i = 0; i < herniMapa.prekazky.size(); i++) {
+                if(snake.body[0].x == herniMapa.prekazky[i].x 
+                    && snake.body[0].y == herniMapa.prekazky[i].y) {
+                    aktualniStav = KONEC_HRY;
+                }
+            }
             
             if(zlateJablko.aktivni) {
                 zlateJablko.zivotnost -= GetFrameTime();
@@ -123,7 +144,8 @@ public:
                 bool snedl = false;
 
                 //naraz do jablka
-                if(snake.body[0].x == jablko.pozice.x && snake.body[0].y == jablko.pozice.y) {
+                if(snake.body[0].x == jablko.pozice.x 
+                    && snake.body[0].y == jablko.pozice.y) {
                     snedl = true;
                 }
 
@@ -144,18 +166,23 @@ public:
                         }
                     }
 
-                if(snake.body.size() ==936) {
+                if(snake.body.size() ==herniMapa.policek) {
                     aktualniStav = VYHRA;
                 }
                 
                 if(snedl == true) {
-                    jablko.Generuj(snake.body);
-                    moveInterval -= 0.005f;
-                    if(moveInterval < 0.05f) moveInterval = 0.05f;
+                    jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
+                        herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
+                    
+                         moveInterval -= 0.002f;
+                    if(moveInterval < 0.07f) moveInterval = 0.07f;
                         
                     pocitadloJablek++;
                     if(pocitadloJablek >= 5 && !zlateJablko.aktivni) {
-                        zlateJablko.Generuj(snake.body, jablko.pozice);
+                        zlateJablko.Generuj(snake.body, jablko.pozice, 
+                            herniMapa.minX, herniMapa.maxX, 
+                            herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
+                        
                         pocitadloJablek = 0;
                     }
                 }
@@ -182,10 +209,14 @@ public:
                 int skore = snake.body.size() -1;
                 spravceZebricku.ulozNovyVysledek(jmenoHrace, skore);
 
-                snake.body.clear();
-                snake.body.push_back({10, 10});
-                snake.direction = {1, 0};
+                snake.Restart(herniMapa.minX, herniMapa.maxX,
+                     herniMapa.minY, herniMapa.maxY);
+                jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
+                herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
+                
                 moveInterval = 0.2f;
+                pocitadloJablek = 0;
+                zlateJablko.aktivni = false;
 
                 jmenoHrace ="";
                 aktualniStav = MENU;
@@ -211,10 +242,14 @@ public:
                     int skore = snake.body.size() -1;
                     spravceZebricku.ulozNovyVysledek(jmenoHrace, skore);
 
-                    snake.body.clear();
-                    snake.body.push_back({10, 10});
-                    snake.direction = {1, 0};
+                    snake.Restart(herniMapa.minX, herniMapa.maxX,
+                         herniMapa.minY, herniMapa.maxY);
+                    jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
+                    herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
+
                     moveInterval = 0.2f;
+                    pocitadloJablek = 0;
+                    zlateJablko.aktivni = false;
 
                     jmenoHrace = "";
                     aktualniStav = MENU;
@@ -237,14 +272,13 @@ public:
     }
 
     void Draw() {
-        ClearBackground(RAYWHITE);
-        DrawRectangleLinesEx({0, 0, 800, 600}, 40, DARKGRAY);
+        herniMapa.Draw();
 
         if(aktualniStav == MENU) {
             DrawText("SNAKE GAME", 265, 200, 40, DARKPURPLE);
             DrawText("Zmackni MEZERNIK pro start", 250, 300, 20, BLACK);
-            DrawText("Zmackni TAB pro nastaveni", 255, 340, 20, LIGHTGRAY);
-            DrawText("Zmackni CTRL pro zebricek", 255, 380, 20, LIGHTGRAY);
+            DrawText("Zmackni TAB pro nastaveni", 255, 340, 20, GRAY);
+            DrawText("Zmackni CTRL pro zebricek", 255, 380, 20, GRAY);
             DrawText("Zmackni ESC pro ukonceni", 255, 420, 20, RED);
         }
         else if(aktualniStav == HRANI) {
