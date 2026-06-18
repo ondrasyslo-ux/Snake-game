@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "zebricek.h"
+#include "jablko.h"
 
 /*    VECI NA PRIDANI
             nastaveni - zmena velikosti okna, zmena barev?, ??jina velikost mapy, 
@@ -21,7 +22,7 @@
 
 /*
 ulozeni:
-g++ snake.cpp zebricek.cpp -o hra.exe -lraylib -lgdi32 -lwinmm
+g++ snake.cpp zebricek.cpp jablko.cpp -o hra.exe -lraylib -lgdi32 -lwinmm
 spusteni:
 .\hra.exe
 */
@@ -32,13 +33,19 @@ public:
     Vector2 direction = {1, 0};
     int size = 20;
 
+    int kTraveni = 0;
+
     void Update(bool snedlJablko = false) {
         Vector2 newHead = { body[0].x + direction.x, body[0].y + direction.y };
         body.push_front(newHead);
 
-        if(!snedlJablko) {
+        if(snedlJablko) {
+        }
+        else if(kTraveni > 0) {
+            kTraveni--;
+        } else {
             body.pop_back();
-        }  
+        }
     }
 
     void Draw() {
@@ -47,37 +54,6 @@ public:
         }
     }
         
-};
-
-class Jablko {
-public:
-    Vector2 pozice;
-    int size = 20;
-
-    void Generuj(std::deque<Vector2> snakeBody) {
-        bool volnaPozice = false;
-        while(!volnaPozice) {
-            pozice.x = GetRandomValue(2, 37);
-            pozice.y = GetRandomValue(2, 27);   
-
-            volnaPozice = true;
-
-            for(int i = 0; i < snakeBody.size(); i++) {
-                if(pozice.x == snakeBody[i].x && pozice.y == snakeBody[i].y) {
-                    volnaPozice = false;
-                    break;
-                }
-            }
-        }
-
-
-       
-    }
-
-    void Draw() {
-        DrawRectangle(pozice.x * size, pozice.y * size, size, size, RED);
-    }
-
 };
 
 enum StavHry {
@@ -93,8 +69,10 @@ class herniNastaveni {
 public:
     Snake snake;
     Jablko jablko;
-
+    ZlateJablko zlateJablko;
     Zebricek spravceZebricku;
+
+    int pocitadloJablek = 0;
 
     StavHry aktualniStav = MENU;
 
@@ -128,19 +106,37 @@ public:
 
             timeSinceLastMove += GetFrameTime();
 
+            //naraz do zdi
             if(snake.body[0].x < 2 || snake.body[0].x > 37 ||
                  snake.body[0].y < 2 || snake.body[0].y > 27) {
                 aktualniStav = KONEC_HRY;
                 }
             
-            if (timeSinceLastMove >= moveInterval) {
+            if(zlateJablko.aktivni) {
+                zlateJablko.zivotnost -= GetFrameTime();
+                if(zlateJablko.zivotnost <= 0) {
+                    zlateJablko.aktivni = false;
+                }
+            }
 
+            if (timeSinceLastMove >= moveInterval) {
                 bool snedl = false;
+
+                //naraz do jablka
                 if(snake.body[0].x == jablko.pozice.x && snake.body[0].y == jablko.pozice.y) {
                     snedl = true;
                 }
+
+                if(zlateJablko.aktivni && snake.body[0].x == zlateJablko.pozice.x 
+                    && snake.body[0].y == zlateJablko.pozice.y) {
+                    zlateJablko.aktivni = false;
+                    snake.kTraveni += 4;
+                    pocitadloJablek = 0;
+                }
+
                 snake.Update(snedl);
 
+                //naraz do tela
                 for(int i = 1; i < snake.body.size(); i++) {
                     if(snake.body[0].x == snake.body[i].x 
                         && snake.body[0].y == snake.body[i].y) {
@@ -155,10 +151,14 @@ public:
                 if(snedl == true) {
                     jablko.Generuj(snake.body);
                     moveInterval -= 0.005f;
-                    if(moveInterval < 0.05f) {
-                        moveInterval = 0.05f;
-                        }
+                    if(moveInterval < 0.05f) moveInterval = 0.05f;
+                        
+                    pocitadloJablek++;
+                    if(pocitadloJablek >= 5 && !zlateJablko.aktivni) {
+                        zlateJablko.Generuj(snake.body, jablko.pozice);
+                        pocitadloJablek = 0;
                     }
+                }
 
                 timeSinceLastMove = 0;
                 }
@@ -201,6 +201,7 @@ public:
                 && (jmenoHrace.length() < 10)) {
                     jmenoHrace += (char)zklavesnice;
                 }
+            }
                 zklavesnice = GetCharPressed();
 
                 if(IsKeyPressed(KEY_BACKSPACE) && jmenoHrace.length() > 0) {
@@ -215,10 +216,9 @@ public:
                     snake.direction = {1, 0};
                     moveInterval = 0.2f;
 
-                    jmenoHrace = " ";
+                    jmenoHrace = "";
                     aktualniStav = MENU;
                 }
-            }
         }
 
         else if(aktualniStav == ZEBRICEK) {
@@ -253,6 +253,7 @@ public:
 
             snake.Draw();
             jablko.Draw();
+            zlateJablko.Draw();
         }
         else if(aktualniStav == NASTAVENI) {
             DrawText("Nastaveni", 265, 200, 40, DARKPURPLE);
