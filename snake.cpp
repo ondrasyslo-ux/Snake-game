@@ -23,7 +23,7 @@
 
 /*
 ulozeni:
-g++ snake.cpp zebricek.cpp jablko.cpp -o hra.exe -lraylib -lgdi32 -lwinmm
+g++ snake.cpp zebricek.cpp jablko.cpp mapa.cpp -o hra.exe -lraylib -lgdi32 -lwinmm
 spusteni:
 .\hra.exe
 */
@@ -214,7 +214,12 @@ public:
                 jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
                 herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
                 
-                moveInterval = 0.2f;
+                if(herniMapa.aktualniMapa == TUTORIAL) {
+                    moveInterval = 0.4f;
+                }   else {
+                    moveInterval = 0.2f;
+                }
+
                 pocitadloJablek = 0;
                 zlateJablko.aktivni = false;
 
@@ -247,7 +252,12 @@ public:
                     jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
                     herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
 
+                    if(herniMapa.aktualniMapa == TUTORIAL) {
+                    moveInterval = 0.4f;
+                    }   else {
                     moveInterval = 0.2f;
+                    }
+
                     pocitadloJablek = 0;
                     zlateJablko.aktivni = false;
 
@@ -263,12 +273,48 @@ public:
         }
 
         else if(aktualniStav == NASTAVENI) {
+            if(IsKeyPressed(KEY_F)) {
+                ToggleFullscreen();
+            }
+            if(IsKeyPressed(KEY_B)) {
+                ToggleBorderlessWindowed();
+            }
             if(IsKeyPressed(KEY_BACKSPACE)) {
                 aktualniStav = MENU;
             }
+            bool zmenaMapy = false;
+            if(IsKeyPressed(KEY_ONE)){
+                herniMapa.NastavMapu(ZAKLADNI);
+                zmenaMapy = true;
+            }
+            if(IsKeyPressed(KEY_TWO)){
+                herniMapa.NastavMapu(KLASIKA);
+                zmenaMapy = true;
+            }
+            if(IsKeyPressed(KEY_THREE)){
+                herniMapa.NastavMapu(SBLOKY);
+                zmenaMapy = true;
+            }
+            if(IsKeyPressed(KEY_FOUR)){
+                herniMapa.NastavMapu(TUTORIAL);
+                zmenaMapy = true;
+            }
+
+            if(zmenaMapy == true) {
+                snake.Restart(herniMapa.minX, herniMapa.maxX,
+                    herniMapa.minY, herniMapa.maxY);
+                jablko.Generuj(snake.body, herniMapa.minX, herniMapa.maxX,
+                    herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
+
+                if(herniMapa.aktualniMapa == TUTORIAL) {
+                    moveInterval = 0.4f;
+                    }   else {
+                    moveInterval = 0.2f;
+                    }
+                pocitadloJablek = 0;
+                zlateJablko.aktivni = false;
+            }
         }
-
-
     }
 
     void Draw() {
@@ -290,8 +336,23 @@ public:
             zlateJablko.Draw();
         }
         else if(aktualniStav == NASTAVENI) {
-            DrawText("Nastaveni", 265, 200, 40, DARKPURPLE);
-            DrawText("Zmackni BACKSPACE pro menu", 250, 300, 20, BLACK);
+            DrawText("Nastaveni", 280, 100, 40, DARKPURPLE);
+            DrawText("Vyber mapu stiskem 1-4", 230, 180, 20, DARKGRAY);
+
+            Color barva1 = (herniMapa.aktualniMapa == ZAKLADNI) ? RED : BLACK;
+            Color barva2 = (herniMapa.aktualniMapa == KLASIKA) ? RED : BLACK;
+            Color barva3 = (herniMapa.aktualniMapa == SBLOKY) ? RED : BLACK;
+            Color barva4 = (herniMapa.aktualniMapa == TUTORIAL) ? RED : BLACK;
+
+            DrawText("1 - Zakladni (35x25)", 250, 220, 20, barva1);
+            DrawText("2 - Klasika (20x20)", 250, 260, 20, barva2);
+            DrawText("3 - Sbloky (20x15)", 250, 300, 20, barva3);
+            DrawText("4 - Tutorial (4x5)", 250, 340, 20, barva4);
+
+            DrawText("Zmackni F pro FULLSCREEN", 200, 430, 20, DARKBLUE);
+            DrawText("Zmackni B pro okno", 200, 470, 20, DARKBLUE);
+
+            DrawText("Zmackni BACKSPACE pro menu", 55, 515, 20, BLACK);
 
         }
         else if(aktualniStav == ZEBRICEK) {
@@ -303,7 +364,7 @@ public:
                     dataZebricku[i].jmeno.c_str(), dataZebricku[i].skore);
                 DrawText( textZaznamu, 200, 180 +(i * 30), 20, BLACK);
             }
-            DrawText("Zmackni BACKSPACE pro menu", 50, 530, 20, BLACK);
+            DrawText("Zmackni BACKSPACE pro menu", 55, 515, 20, BLACK);
         }
         else if(aktualniStav == KONEC_HRY) {
             DrawText("KONEC HRY!", 265, 150, 40, RED);

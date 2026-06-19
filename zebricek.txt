@@ -10,3 +10,9 @@ test7 3
 test8 9
 test9 20test10 8 
 novypokus 35 
+ 1 
+novahra 28 
+fad 0 
+ 2 
+ 0 
+ 0 
