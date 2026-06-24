@@ -1,5 +1,6 @@
 #include "jablko.h"
 #include <vector>
+//soubor s fungovanim jablka
 
 void Jablko::Generuj(std::deque<Vector2> snakeBody,
     int minX, int maxX, int minY, int maxY, std::vector<Vector2> prekazky) {

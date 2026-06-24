@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include <deque>
 #include <vector>
+//hlavickovy soubor s fungovanim jablka
 
 class Jablko {
 public:
