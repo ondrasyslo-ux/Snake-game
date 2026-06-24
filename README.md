@@ -72,9 +72,13 @@ Všechno na jedné hromadě: Nejdřív jen čtvereček, co se hýbe po obrazovce
 
 
 Paměť na skóre: Přidání žebříčku a komunikace s .txt souborem, aby se nejlepší výkony po vypnutí hry neztratily.
+<img width="798" height="627" alt="image" src="https://github.com/user-attachments/assets/59f7f36b-dc68-4c65-9adc-0773de3b91c7" />
+
 
 
 Skutečná výhra: Přidání podmínky, která hlídá, jestli už had nezabral celou plochu. Konečně se hra dá reálně dohrát.
+<img width="796" height="627" alt="image" src="https://github.com/user-attachments/assets/d88babe1-3314-4ac5-9ece-901eb19cac17" />
+
 
 
 Chytřejší jablka a rytmus hry: Vytvoření systému, který počítá snědená jablka a posílá na mapu mizející zlaté bonusy.
@@ -84,7 +88,8 @@ Velký úklid kódu: Vytrhání logiky jablek a map ven z hlavního souboru, aby
 
 
 Různé mapy: Finální dodělání výběru různých map (od obrovských po malé s překážkami) a vyladění okna, které se k nim umí přizpůsobit.
-
+<img width="792" height="627" alt="image" src="https://github.com/user-attachments/assets/e5d7fb9d-2aa0-4c21-8629-c009ff310d75" />
+<img width="791" height="621" alt="image" src="https://github.com/user-attachments/assets/7a82a3ed-da13-49d3-bd45-55cea43f9a58" />
 
 
 ⚙️ Pro spuštění hry je potřeba:
