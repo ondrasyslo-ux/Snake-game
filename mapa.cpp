@@ -13,7 +13,7 @@ void Mapa::NastavMapu(TypMapy novyTyp)  {
         minX = 2; maxX = 36;
         minY = 2; maxY = 26;
         policek = 35 * 25;
-        SetWindowSize(800, 600);
+        oknoSirka = 800; oknoVyska = 600;
     }
 
     else if(aktualniMapa == TUTORIAL)   {
@@ -21,7 +21,7 @@ void Mapa::NastavMapu(TypMapy novyTyp)  {
         minX = 2; maxX = 5;
         minY = 2; maxY = 6;
         policek = 4 * 5;
-        SetWindowSize(160, 180);
+        oknoSirka = 160; oknoVyska = 180;
     }
 
     else if(aktualniMapa == KLASIKA)    {
@@ -29,7 +29,7 @@ void Mapa::NastavMapu(TypMapy novyTyp)  {
         minX = 2; maxX = 21;
         minY = 2; maxY = 21;
         policek = 20 * 20;
-        SetWindowSize(480, 480);
+        oknoSirka = 480; oknoVyska = 480;
     }
 
     else if(aktualniMapa == SBLOKY)     {
@@ -37,8 +37,8 @@ void Mapa::NastavMapu(TypMapy novyTyp)  {
         minX = 2; maxX = 21;
         minY = 2; maxY = 16;
         policek = 20 * 15;
-        SetWindowSize(480, 380);
-        
+        oknoSirka = 480; oknoVyska = 380;
+
         //levy horni
         prekazky.push_back({6, 5}); prekazky.push_back({7, 5});
         prekazky.push_back({6, 6}); prekazky.push_back({7, 6});
@@ -57,7 +57,6 @@ void Mapa::NastavMapu(TypMapy novyTyp)  {
 }
 
 void Mapa::Draw() {
-    ClearBackground(RAYWHITE);
 
     DrawRectangleLinesEx({0, 0, (float)GetScreenWidth(),
          (float)GetScreenHeight()}, 40, DARKGRAY);

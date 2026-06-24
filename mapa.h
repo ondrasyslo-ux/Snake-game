@@ -11,6 +11,9 @@ enum TypMapy {
 
 class Mapa {
 public:
+    int oknoSirka;
+    int oknoVyska;
+
     std::vector<Vector2> prekazky;
 
     TypMapy aktualniMapa = ZAKLADNI;

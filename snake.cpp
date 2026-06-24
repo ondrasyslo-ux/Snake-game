@@ -103,6 +103,7 @@ public:
     void Update() {
         if(aktualniStav == MENU) {
             if(IsKeyPressed(KEY_SPACE)) {
+                SetWindowSize(herniMapa.oknoSirka, herniMapa.oknoVyska);
                 aktualniStav = HRANI;
             }
             if(IsKeyPressed(KEY_TAB)) {
@@ -123,12 +124,15 @@ public:
             //naraz do zdi
             if(snake.body[0].x < herniMapa.minX || snake.body[0].x > herniMapa.maxX ||
                  snake.body[0].y < herniMapa.minY || snake.body[0].y > herniMapa.maxY) {
+                SetWindowSize(800, 600);
                 aktualniStav = KONEC_HRY;
+                
                 }
 
             for(int i = 0; i < herniMapa.prekazky.size(); i++) {
                 if(snake.body[0].x == herniMapa.prekazky[i].x 
                     && snake.body[0].y == herniMapa.prekazky[i].y) {
+                    SetWindowSize(800, 600);
                     aktualniStav = KONEC_HRY;
                 }
             }
@@ -162,11 +166,13 @@ public:
                 for(int i = 1; i < snake.body.size(); i++) {
                     if(snake.body[0].x == snake.body[i].x 
                         && snake.body[0].y == snake.body[i].y) {
+                    SetWindowSize(800, 600);
                    aktualniStav = KONEC_HRY;
                         }
                     }
 
                 if(snake.body.size() ==herniMapa.policek) {
+                    SetWindowSize(800, 600);
                     aktualniStav = VYHRA;
                 }
                 
@@ -318,7 +324,10 @@ public:
     }
 
     void Draw() {
-        herniMapa.Draw();
+        ClearBackground(RAYWHITE);
+        if(aktualniStav != HRANI) {
+            DrawRectangleLinesEx({0, 0, 800, 600}, 40, DARKGRAY);
+        }
 
         if(aktualniStav == MENU) {
             DrawText("SNAKE GAME", 265, 200, 40, DARKPURPLE);
@@ -328,6 +337,8 @@ public:
             DrawText("Zmackni ESC pro ukonceni", 255, 420, 20, RED);
         }
         else if(aktualniStav == HRANI) {
+            herniMapa.Draw();
+
             int skore = snake.body.size() -1;
             DrawText(TextFormat("Skore: %i", skore), 10, 10, 20, PINK);
 
