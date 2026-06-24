@@ -1,6 +1,7 @@
 #include "zebricek.h"
 #include <fstream>
 #include <algorithm>
+//soubor pro praci se souborem zebricek.txt
 
 Zebricek::Zebricek(std::string soubor) {
     nazevSouboru = soubor;

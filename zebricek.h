@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+//hlavickovy soubor zebricku
 
 struct ZaznamZebricku {
     std::string jmeno;
