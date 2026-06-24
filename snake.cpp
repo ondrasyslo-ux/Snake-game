@@ -12,6 +12,7 @@
 /*
 ulozeni:
 g++ snake.cpp zebricek.cpp jablko.cpp mapa.cpp -o hra.exe -lraylib -lgdi32 -lwinmm
+
 spusteni:
 .\hra.exe
 */
