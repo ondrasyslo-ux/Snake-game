@@ -1,4 +1,5 @@
 #include "mapa.h"
+//soubor pro nastavovani map
 
 Mapa::Mapa() {
     NastavMapu(ZAKLADNI);

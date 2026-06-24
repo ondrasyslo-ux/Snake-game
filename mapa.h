@@ -1,6 +1,7 @@
 #pragma once
 #include "raylib.h"
 #include <vector>
+//hlavickovy soubor nastaveni map
 
 enum TypMapy {
     ZAKLADNI,
