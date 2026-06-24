@@ -6,8 +6,10 @@ Vysvětlivky funkcí/řádků
 	#include <algorithm>
 
 raylib.h: Umožňuje nám kreslit okno, brát vstup z klávesnice a používat herní funkce.
-<deque>: Speciální typ pole (fronta), ze které je postavené tělo hada. Umí bleskově přidávat na začátek a mazat z konce.
-<algorithm>: Obsahuje funkci std::sort, kterou používáme k seřazení hráčů v žebříčku od nejvyššího skóre po nejnižší.
+
+deque: Speciální typ pole (fronta), ze které je postavené tělo hada. Umí bleskově přidávat na začátek a mazat z konce.
+
+algorithm: Obsahuje funkci std::sort, kterou používáme k seřazení hráčů v žebříčku od nejvyššího skóre po nejnižší.
 
 	void Restart(int minX, int maxX, int minY, int maxY) {
     	body.clear();
@@ -94,20 +96,32 @@ GetRandomValue - vybere nahodne cislo podle souradnic map,
         }
 fungovani zlateho jablka, po 5 snedenych jablek se objevi zlate jablko a ve hre zustava 5 sekund
 
+📄 Soubor: zebricek.cpp
 
+Nacitani dat ze souboru (nactiZebricek)
 
+        void Zebricek::nactiZebricek() {
+            std::ifstream soubor(jmenoSouboru);
+            if (!soubor.is_open()) return;
+otevreni souboru pro cteni
 
+        std::sort(topHraci.begin(), topHraci.end(), 
+            [](const ZaznamZebricku& a, const ZaznamZebricku& b) {
+        return a.skore > b.skore;
+            });
+Funkce std::sort umí seřadit pole od začátku (begin()) do konce (end()). Ten zvláštní zápis v hranatých a kulatých závorkách na konci je naše vlastní pravidlo pro řazení.
 
+        if (zaznamy.size() > 10) {
+        zaznamy.resize(10);
+            }
+Ořezání žebříčku na TOP 10
 
-
-
-
-
-
-
-
-
-
-
+        std::ofstream soubor(jmenoSouboru);
+            for (const auto& zaznam : zaznamy) {
+                soubor << zaznam.jmeno << " " << zaznam.skore << "\n";
+            }
+        soubor.close();
+        }
+zapis zpet na disk
 
             
