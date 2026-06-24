@@ -9,18 +9,6 @@
 #include "jablko.h"
 #include "mapa.h"
 
-/*    VECI NA PRIDANI
-            nastaveni - zmena velikosti okna na fullscreen, zmena barev?,
-            jina mapa s bloky do kterych lze narazit uvnitr
-            mapy:
-                zakladni, tutorial na ukazku(4x5), s bloky
-
-        predelat do vice hlavickovych souboru
-
-    ultimatni vyhra
-    specialni pamlsek co da vice bodu tela
-*/
-
 /*
 ulozeni:
 g++ snake.cpp zebricek.cpp jablko.cpp mapa.cpp -o hra.exe -lraylib -lgdi32 -lwinmm
@@ -121,6 +109,12 @@ public:
 
             timeSinceLastMove += GetFrameTime();
 
+            if(IsKeyPressed(KEY_W)) {
+                SetWindowSize(800, 600);
+                aktualniStav = VYHRA;
+
+            }
+
             //naraz do zdi
             if(snake.body[0].x < herniMapa.minX || snake.body[0].x > herniMapa.maxX ||
                  snake.body[0].y < herniMapa.minY || snake.body[0].y > herniMapa.maxY) {
@@ -128,7 +122,7 @@ public:
                 aktualniStav = KONEC_HRY;
                 
                 }
-
+            //naraz do prekazky
             for(int i = 0; i < herniMapa.prekazky.size(); i++) {
                 if(snake.body[0].x == herniMapa.prekazky[i].x 
                     && snake.body[0].y == herniMapa.prekazky[i].y) {
@@ -184,7 +178,7 @@ public:
                     if(moveInterval < 0.07f) moveInterval = 0.07f;
                         
                     pocitadloJablek++;
-                    if(pocitadloJablek >= 5 && !zlateJablko.aktivni) {
+                    if(pocitadloJablek >= 5 && !zlateJablko.aktivni && herniMapa.aktualniMapa != TUTORIAL) {
                         zlateJablko.Generuj(snake.body, jablko.pozice, 
                             herniMapa.minX, herniMapa.maxX, 
                             herniMapa.minY, herniMapa.maxY, herniMapa.prekazky);
@@ -243,14 +237,15 @@ public:
                 && (jmenoHrace.length() < 10)) {
                     jmenoHrace += (char)zklavesnice;
                 }
-            }
                 zklavesnice = GetCharPressed();
+            }
+                
 
                 if(IsKeyPressed(KEY_BACKSPACE) && jmenoHrace.length() > 0) {
                     jmenoHrace.pop_back();
                 }
                 if(IsKeyPressed(KEY_ENTER)) {
-                    int skore = snake.body.size() -1;
+                    int skore = herniMapa.policek -1;
                     spravceZebricku.ulozNovyVysledek(jmenoHrace, skore);
 
                     snake.Restart(herniMapa.minX, herniMapa.maxX,
@@ -393,7 +388,7 @@ public:
         else if(aktualniStav == VYHRA) {
             DrawText("VYHRAL JSI!", 265, 150, 40, GOLD);
 
-            int skore = snake.body.size() -1;
+            int skore = herniMapa.policek -1;
             DrawText(TextFormat("Vyhral jsi, skore: %i", skore), 250, 220, 40, DARKBROWN);
 
             DrawText("Zadejte sve jmeno:", 305, 280, 20, GREEN);
@@ -408,6 +403,7 @@ public:
 };
 
 int main()  {
+    SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(800, 600, "Snake");
     SetTargetFPS(60);
 
